@@ -1,0 +1,28 @@
+{
+  "name": "express-graphql-boilerplate",
+  "version": "1.0.0",
+  "description": "This is boilerplate project with node/express/graphql tech stack",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "sedoo",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "express-graphql": "^0.6.12",
+    "graphql": "^14.0.2",
+    "helmet": "^3.13.0",
+    "morgan": "^1.9.1",
+    "winston": "2.4.2"
+  },
+  "devDependencies": {
+    "eslint": "5.0.0-alpha.2",
+    "eslint-config-standard": "12.0.0-alpha.0",
+    "eslint-plugin-import": "2.11.0",
+    "eslint-plugin-node": "6.0.1",
+    "eslint-plugin-promise": "3.7.0",
+    "eslint-plugin-standard": "3.1.0"
+  }
+}
