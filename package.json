@@ -4,7 +4,7 @@
   "description": "This is boilerplate project with node/express/graphql tech stack",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "author": "sedoo",
   "license": "ISC",
@@ -12,9 +12,11 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "express-graphql": "^0.6.12",
+    "express-jwt": "^5.3.1",
     "graphql": "^14.0.2",
     "helmet": "^3.13.0",
     "morgan": "^1.9.1",
+    "nodemon": "^1.18.4",
     "winston": "2.4.2"
   },
   "devDependencies": {

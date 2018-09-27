@@ -6,9 +6,10 @@
 
 const app = require('express')();
 const bodyParser = require('body-parser');
-const logger = require('morgan');
+const morgan = require('morgan');
 const helmet = require('helmet');
 const graphqlHttp = require('express-graphql');
+const expressJwt = require('express-jwt');
 const config = require('./config');
 const log = require('./logger');
 const { graphqlSchema } = require('./graphqlSchema');
@@ -20,7 +21,7 @@ const pckg = require('./package');
 app.use(helmet());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-app.use(logger('dev'));
+app.use(morgan('dev'));
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     if (req.headers['access-control-request-headers']) {
@@ -35,8 +36,18 @@ app.use((req, res, next) => {
 });
 
 /**
+ * Setup JWT based token protection on all GraphQL ednpoints
+ * NOTE: Must be used before GraphQL route setup
+ */
+
+app.use(expressJwt({
+  secret: config.tokenSecret
+}).unless({path: ['/']}));
+
+/**
  * Setup GraphQL route
  */
+
 app.use('/graphql', graphqlHttp({
   schema: graphqlSchema,
   graphiql: true // Set this to false if you don't want graphiql in browser env
@@ -45,6 +56,7 @@ app.use('/graphql', graphqlHttp({
 /**
  * Root endpoint
  */
+
 app.get('/', (req, res) => {
   res.send(`Greetings from ${pckg.name}`);
 });
@@ -60,10 +72,24 @@ app.use((req, res, next) => {
 });
 
 /**
+ * Unauthorized error handler
+ */
+
+app.use((err, req, res, next) => {
+  if (err.name === 'UnauthorizedError') {
+    log.error(err.message);
+    res.status(401).send(JSON.stringify({error: err.name}));
+  } else {
+    next(err);
+  }
+});
+
+/**
  * Production error handler
  */
 
 app.use((err, req, res) => {
+  log.error(err.message);
   res.status(err.status || 500);
   res.json({message: err.message, error: err});
 });
@@ -82,8 +108,8 @@ app.listen(config.port, () => {
  */
 
 process.on('uncaughtException', err => {
-  winston.log('error', (new Date()).toUTCString() + ' uncaughtException:', err.message);
-  winston.log('info', err.stack);
+  log.error((new Date()).toUTCString() + ' uncaughtException:', err.message);
+  log.info(err.stack);
   process.exit(1);
 });
 
@@ -92,7 +118,7 @@ process.on('uncaughtException', err => {
  */
 
 process.on('unhandledRejection', err => {
-  winston.log('error', (new Date()).toUTCString() + ' unhandledRejection:', err.message);
-  winston.log('info', err.stack);
+  log.error((new Date()).toUTCString() + ' unhandledRejection:', err.message);
+  log.info(err.stack);
   process.exit(1);
 });
